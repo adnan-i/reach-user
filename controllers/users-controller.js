@@ -1,7 +1,8 @@
 'use strict';
 
-let flux = Reach.IO.flux;
-let User = Reach.model('User');
+let bcrypt = require('co-bcrypt');
+let flux   = Reach.IO.flux;
+let User   = Reach.model('User');
 
 module.exports = Reach.resource(function (_super) {
 
@@ -20,10 +21,10 @@ module.exports = Reach.resource(function (_super) {
    * @param  {Object} post
    */
   UsersController.prototype.store = function *(post) {
-    var resourceName = this._resource.name;
-    var model        = new User(post);
+    var resourceName   = this._resource.name;
+    var model          = new User(post);
+        model.password = yield bcrypt.hash(post.password, 10);
 
-    yield model.preparePassword(post.password);
     yield model.save();
 
     // ### Flux Action
