@@ -1,8 +1,9 @@
 'use strict';
 
 let bcrypt = require('co-bcrypt');
-let flux   = Reach.IO.flux;
+let queue  = Reach.service('queue');
 let User   = Reach.model('User');
+let flux   = Reach.IO.flux;
 
 module.exports = Reach.resource(function (_super) {
 
@@ -21,15 +22,38 @@ module.exports = Reach.resource(function (_super) {
    * @param  {Object} post
    */
   UsersController.prototype.store = function *(post) {
-    var resourceName   = this._resource.name;
-    var model          = new User(post);
-        model.password = yield bcrypt.hash(post.password, 10);
+    let resourceName = this._resource.name;
+    let model        = new User(post);
+
+    model.password = yield bcrypt.hash(post.password, 10);
+    model._actor   = this._actor;
 
     yield model.save();
 
+    // ### Email
+
+    let job = queue
+      .create('user-welcome-email', {
+        template : 'user-welcome-email',
+        context  : {
+          name    : model.firstName + ' ' + model.lastName,
+          company : 'Reach',
+          confirm : 'http://local.io:8081/users/email-confirm/sample'
+        },
+        from     : 'no-reply@reach.github.io',
+        to       : model.email,
+        subject  : 'Welcome to Reach'
+      })
+      .save()
+    ;
+
+    job.on('complete', function () {
+      job.remove();
+    });
+
     // ### Flux Action
 
-    var payload = {};
+    let payload = {};
 
     payload.actionType    = 'user:stored';
     payload[resourceName] = model.toJSON();
@@ -37,6 +61,10 @@ module.exports = Reach.resource(function (_super) {
     flux(payload);
 
     return model;
+  };
+
+  UsersController.prototype.confirmEmail = function *() {
+    // ...
   };
 
   /**

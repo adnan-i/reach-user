@@ -1,6 +1,6 @@
 {
   "name": "reach-user",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "author": "Christoffer Rødvik",
   "description": "A reach-api user module providing access to user handling from front end applications",
   "license": "MIT",
