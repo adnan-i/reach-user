@@ -3,6 +3,7 @@
 let bcrypt = require('co-bcrypt');
 let queue  = Reach.service('queue');
 let User   = Reach.model('User');
+let error  = Reach.ErrorHandler;
 let flux   = Reach.IO.flux;
 
 module.exports = Reach.resource(function (_super) {
@@ -63,10 +64,6 @@ module.exports = Reach.resource(function (_super) {
     return model;
   };
 
-  UsersController.prototype.confirmEmail = function *() {
-    // ...
-  };
-
   /**
    * Returns the profile of the authenticated user
    * @method me
@@ -76,6 +73,68 @@ module.exports = Reach.resource(function (_super) {
     return this.auth.user;
   };
 
- return UsersController;
+  /**
+   * @method update
+   * @param  {String} id
+   * @param  {Object} data
+   */
+  UsersController.prototype.update = function *(id, data) {
+    let user = yield getUser(id, this._actor);
+    yield verifyOwnership(this.auth.user, user);
+    for (let key in data) {
+      if (user.hasOwnProperty(key)) {
+        user[key] = data[key];
+      }
+    }
+    yield user.update();
+    return user;
+  };
+
+  /**
+   * @method delete
+   * @param  {String} id
+   */
+  UsersController.prototype.delete = function *(id) {
+    let user = yield getUser(id, this._actor);
+    yield verifyOwnership(this.auth.user, user);
+    yield user.delete();
+    return user;
+  };
+
+  /**
+   * @private
+   * @method getUser
+   * @param  {String} id
+   * @param  {Object} actor
+   * @return {User}
+   */
+  function *getUser(id, actor) {
+    let user = yield User.find(id);
+    if (!user) {
+      throw error.parse({
+        code    : 'USER_NOT_FOUND',
+        message : 'The requested user was not found in our records'
+      }, 404);
+    }
+    user._actor = actor;
+    return user;
+  }
+
+  /**
+   * @private
+   * @method verifyOwnership
+   * @param  {Object} user
+   * @param  {Object} model
+   */
+  function *verifyOwnership(user, model) {
+    if (user.id !== model.id && 'admin' !== user.role) {
+      throw error.parse({
+        code    : 'ACCESS_DENIED',
+        message : 'You do not have access to update this user'
+      }, 401);
+    }
+  }
+
+  return UsersController;
 
 });
