@@ -3,6 +3,7 @@
 let bcrypt = require('co-bcrypt');
 let queue  = Reach.service('queue');
 let User   = Reach.model('User');
+let config = Reach.config;
 let error  = Reach.ErrorHandler;
 let flux   = Reach.IO.flux;
 
@@ -24,26 +25,27 @@ module.exports = Reach.resource(function (_super) {
    */
   UsersController.prototype.store = function *(post) {
     let resourceName = this._resource.name;
-    let model        = new User(post);
+    let user         = new User(post);
 
-    model.password = yield bcrypt.hash(post.password, 10);
-    model._actor   = this._actor;
+    // ### Save User
 
-    yield model.save();
+    user._actor   = this._actor;
+    user.password = yield bcrypt.hash(post.password, 10);
+    yield user.save();
 
     // ### Email
 
     let job = queue
       .create('user-welcome-email', {
+        to       : user.email,
+        from     : config.email.sender,
+        subject  : 'Registration complete',
         template : 'user-welcome-email',
         context  : {
-          name    : model.firstName + ' ' + model.lastName,
-          company : 'Reach',
+          name    : user.name(),
+          company : config.api.name,
           confirm : 'http://local.io:8081/users/email-confirm/sample'
-        },
-        from     : 'no-reply@reach.github.io',
-        to       : model.email,
-        subject  : 'Welcome to Reach'
+        }
       })
       .save()
     ;
@@ -57,11 +59,11 @@ module.exports = Reach.resource(function (_super) {
     let payload = {};
 
     payload.actionType    = 'user:stored';
-    payload[resourceName] = model.toJSON();
+    payload[resourceName] = user.toJSON();
 
     flux(payload);
 
-    return model;
+    return user;
   };
 
   /**
