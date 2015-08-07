@@ -1,11 +1,10 @@
 'use strict';
 
 Reach.ErrorHandler.addRouteHandler('POST /users', function (err) {
-  if ('ER_DUP_ENTRY' === err.code) {
-    err.status = 400;
-    err.data   = {
-      email: err.message.match(/Duplicate entry '(.*?)'/)[1]
-    };
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    err.code    = 'USER_EMAIL_DUP';
+    err.status  = 400;
+    err.data    = err.fields;
     err.message = 'The email you entered is already in use';
   }
   return err;

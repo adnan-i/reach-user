@@ -63,7 +63,7 @@ describe('POST /users', function () {
     });
     let body = res.body;
     assert.equal(res.statusCode, 400, body.message);
-    assert.equal(body.code, 'ER_DUP_ENTRY', body.code);
+    assert.equal(body.code, 'USER_EMAIL_DUP', body.code);
   });
 });
 

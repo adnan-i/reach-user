@@ -7,25 +7,16 @@ let config = Reach.config;
 let error  = Reach.ErrorHandler;
 let flux   = Reach.IO.flux;
 
-module.exports = Reach.resource(function (_super) {
-
-  Reach.extends(UsersController, _super);
+Reach.Register.ResourceController('User', 'UsersController', function (controller) {
 
   /**
-   * @class UsersController
-   */
-  function UsersController() {
-    _super.call(this, 'User');
-  }
-
-  /**
-   * Creates a new user
+   * Stores the user and sends a welcome email.
    * @method store
    * @param  {Object} post
+   * @return {User}
    */
-  UsersController.prototype.store = function *(post) {
-    let resourceName = this._resource.name;
-    let user         = new User(post);
+  controller.store = function *(post) {
+    let user = new User(post);
 
     // ### Save User
 
@@ -58,31 +49,31 @@ module.exports = Reach.resource(function (_super) {
 
     let payload = {};
 
-    payload.actionType    = 'user:stored';
-    payload[resourceName] = user.toJSON();
+    payload.actionType = 'user:stored';
+    payload.user       = user.toJSON();
 
     flux(payload);
 
     return user;
-  };
+  },
 
   /**
-   * Returns the profile of the authenticated user
    * @method me
-   * @return {object}
+   * @return {User}
    */
-  UsersController.prototype.me = function *() {
+  controller.me = function *() {
     return this.auth.user;
   };
 
   /**
    * @method update
-   * @param  {String} id
+   * @param  {Mixed}  id
    * @param  {Object} data
+   * @return {User}
    */
-  UsersController.prototype.update = function *(id, data) {
+  controller.update = function *(id, data) {
     let user = yield getUser(id, this._actor);
-    yield verifyOwnership(this.auth.user, user);
+    controller._hasAccess(this.auth.user, user);
     for (let key in data) {
       if (user.hasOwnProperty(key)) {
         user[key] = data[key];
@@ -94,13 +85,29 @@ module.exports = Reach.resource(function (_super) {
 
   /**
    * @method delete
-   * @param  {String} id
+   * @param  {Mixed} id
+   * @return {User}
    */
-  UsersController.prototype.delete = function *(id) {
+  controller.delete = function *(id) {
     let user = yield getUser(id, this._actor);
-    yield verifyOwnership(this.auth.user, user);
+    controller._hasAccess(this.auth.user, user);
     yield user.delete();
     return user;
+  };
+
+  /**
+   * Check if the authenticated client has access to edit content.
+   * @method _hasAccess
+   * @param  {User} user
+   * @param  {User} model
+   */
+  controller._hasAccess = function (user, model) {
+    if (user.id !== model.id && user.role !== 'admin') {
+      throw error.parse({
+        code    : 'ACCESS_DENIED',
+        message : 'You do not have access to update this user'
+      }, 401);
+    }
   };
 
   /**
@@ -111,7 +118,7 @@ module.exports = Reach.resource(function (_super) {
    * @return {User}
    */
   function *getUser(id, actor) {
-    let user = yield User.find(id);
+    let user = yield User.findById(id);
     if (!user) {
       throw error.parse({
         code    : 'USER_NOT_FOUND',
@@ -122,21 +129,6 @@ module.exports = Reach.resource(function (_super) {
     return user;
   }
 
-  /**
-   * @private
-   * @method verifyOwnership
-   * @param  {Object} user
-   * @param  {Object} model
-   */
-  function *verifyOwnership(user, model) {
-    if (user.id !== model.id && 'admin' !== user.role) {
-      throw error.parse({
-        code    : 'ACCESS_DENIED',
-        message : 'You do not have access to update this user'
-      }, 401);
-    }
-  }
-
-  return UsersController;
-
+  return controller;
+  
 });
