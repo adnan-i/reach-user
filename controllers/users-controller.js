@@ -1,6 +1,7 @@
 'use strict';
 
 let bcrypt = require('co-bcrypt');
+let query  = Reach.service('sequelize/helpers').query;
 let queue  = Reach.service('queue');
 let User   = Reach.model('User');
 let config = Reach.config;
@@ -109,6 +110,12 @@ Reach.Register.ResourceController('User', 'UsersController', function (controlle
       }, 401);
     }
   };
+
+  /**
+   * @property _options
+   * @type     Function
+   */
+  controller._options = config.user.filter.bind(null, query);
 
   /**
    * @private
