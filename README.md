@@ -1,21 +1,64 @@
-User Module
-===========
+# Reach Log
 
-Provides [reach-api](https://github.com/reach/api) with user management.
+  - [Introduction](#introduction)
+  - [Dependencies](#dependencies)
+  - [Config](#config)
+  - [Routes](#routes)
 
-### Dependencies
+## [Introduction](#introduction)
 
-User module depends on the availability of a `mysql` server
+This module provides reach-api with user management features such as creating, listing, updating and deleting users.
 
-### Routes
+## [Dependencies](#dependencies)
 
-This module provides the following routes
+Make sure you have the following dependencies available:
+
+ - reach-email@0.0.4
+
+## [Config](#config)
+
+Default configuration file:
+
+```js
+module.exports = {
+
+  /*
+   |--------------------------------------------------------------------------------
+   | User
+   |--------------------------------------------------------------------------------
+   |
+   | filter : Function providing the available filtering options for the user
+   |
+   */
+
+  user : {
+    filter : function (query, options) {
+      return query(options, {
+        where : {
+          firstName : { $like : query.STRING },
+          lastName  : { $like : query.STRING },
+          email     : query.STRING,
+          facebook  : query.STRING,
+          twitter   : query.STRING,
+          linkedin  : query.STRING,
+          stripeId  : query.STRING
+        }
+      });
+    }
+  }
+
+};
+```
+
+## [Routes](#routes)
+
+The module currently provides the following routing options:
 
 ```
-POST /users          Creates a new user
-GET  /users          Lists users
-GET  /users/profile  Retrieves authenticated user
-GET  /users/:id      Retrieves user by :id
-PUT  /users/:id      Updates user by :id
-DEL  /users/:id      Deletes user by :id
+POST /users
+GET  /users
+GET  /users/me
+GET  /users/:id
+PUT  /users/:id
+DEL  /users/:id
 ```
