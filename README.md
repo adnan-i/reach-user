@@ -1,4 +1,4 @@
-# Reach Log
+# Reach User
 
   - [Introduction](#introduction)
   - [Dependencies](#dependencies)
