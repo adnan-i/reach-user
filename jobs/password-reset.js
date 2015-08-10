@@ -6,9 +6,9 @@ let log   = Reach.Log;
 
 Reach
   .service('queue')
-  .process('user-welcome-email', function (job, done) {
+  .process('user-password-reset', function (job, done) {
     if (Reach.ENV === 'test') { return done(); }
-    log.debug('Sending user welcome email to: ' + job.data.to);
+    log.debug('Sending password reset email to: ' + job.data.to);
     co(function *() {
       let email = new Email();
       yield email.send(job.data);
