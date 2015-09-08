@@ -1,6 +1,6 @@
 'use strict';
 
 Reach
-  .service('queue')
+  .provider('queue')
   .loader(__dirname + '/jobs')
 ;

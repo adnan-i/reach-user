@@ -63,7 +63,7 @@ Reach.Register.ResourceController('User', 'UsersController', function (controlle
    * @property _options
    * @type     Function
    */
-  controller._options = config.filter.bind(null, Reach.service('sequelize/helpers').query);
+  controller._options = config.filter.bind(null, Reach.provider('sequelize/helpers').query);
 
   return controller;
   
