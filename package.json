@@ -1,6 +1,6 @@
 {
   "name": "reach-user",
-  "version": "0.1.10",
+  "version": "0.2.0",
   "author": "Christoffer Rødvik",
   "description": "A reach-api user module providing access to user handling from front end applications",
   "license": "MIT",
@@ -9,7 +9,6 @@
   },
   "reach": {
     "name": "user",
-    "type": "module",
-    "main": "init.js"
+    "type": "module"
   }
 }
