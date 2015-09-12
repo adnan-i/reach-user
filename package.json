@@ -1,11 +1,11 @@
 {
   "name": "reach-user",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Christoffer Rødvik",
   "description": "A reach-api user module providing access to user handling from front end applications",
   "license": "MIT",
   "dependencies": {
-    "co-bcrypt": "1.0.0"
+    "bcryptjs": "2.2.1"
   },
   "reach": {
     "name": "user",
