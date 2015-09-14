@@ -2,7 +2,7 @@
 
 let userService     = require('../lib/user-service');
 let passwordService = require('../lib/password-service');
-let error           = Reach.ErrorHandler;
+let error           = Reach.Error;
 let config          = Reach.config.user;
 
 Reach.Register.ResourceController('User', 'UsersController', function (controller) {
