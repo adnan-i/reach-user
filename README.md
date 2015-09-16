@@ -1,20 +1,19 @@
 # Reach User
 
-  - [Introduction](#introduction)
-  - [Dependencies](#dependencies)
+  - [Setup](#setup)
   - [Config](#config)
   - [Routes](#routes)
-    - [Postman](https://www.getpostman.com/collections/c04c087ffb8793e2db9c)
 
-## [Introduction](#introduction)
+## [Setup](#setup)
 
 This module provides reach-api with user management features such as creating, listing, updating and deleting users.
 
-## [Dependencies](#dependencies)
+First start off by going into the root of the reach-api and run the following command.
 
-Make sure you have the following dependencies available:
-
- - reach-email@0.0.4
+```sh
+# Install required reach packages.
+$ reach install reach-user reach-bcrypt --save
+```
 
 ## [Config](#config)
 
@@ -28,21 +27,27 @@ module.exports = {
    | User
    |--------------------------------------------------------------------------------
    |
-   | filter : Function providing the available filtering options for the user
+   | admins : Array    > List of admin users to create if user table is empty.
+   | filter : Function > Function providing the available filtering options for the 
+   |                     user.
    |
    */
 
   user : {
+    admins : [
+      {
+        firstName : 'John',
+        lastName  : 'Doe',
+        email     : 'admin@fixture.none',
+        password  : 'admin',
+      }
+    ],
     filter : function (query, options) {
       return query(options, {
         where : {
           firstName : { $like : query.STRING },
           lastName  : { $like : query.STRING },
-          email     : query.STRING,
-          facebook  : query.STRING,
-          twitter   : query.STRING,
-          linkedin  : query.STRING,
-          stripeId  : query.STRING
+          email     : query.STRING
         }
       });
     }
@@ -51,15 +56,88 @@ module.exports = {
 };
 ```
 
+## [Hooks](#hooks)
+
+This module currently provides access to two hooks, `user:register` and `user:password-reset`.
+
+**user:register**
+
+```js
+hooks.set('user:register', function *(user) {
+  /*
+    user : The User model that was created successfully.
+   */
+});
+```
+
+**user:password-reset**
+
+```js
+hooks.set('user:password-reset', function *(user, token, resetUrl) {
+  /*
+    user     : The User model that is requesting a password reset.
+    token    : The token required to reset the password.
+    resetUrl : The url pointing to the front end endpoint for resetting the password.
+   */
+});
+```
+
 ## [Routes](#routes)
 
 The module currently provides the following routing options:
 
+**POST /users**
+
 ```
-POST /users
-GET  /users
-GET  /users/me
-GET  /users/:id
-PUT  /users/:id
-DEL  /users/:id
+{
+  ...values
+}
+```
+
+**GET /users?...options**
+
+The query options available are defined in the configuration filter.
+
+**GET /users/me**
+
+Returns the authenticated user based on the `Authorization` token provided.
+
+**GET /users/:id**
+
+Returns a single user based on the provided `id`.
+
+**PUT /users/:id**
+
+You must either be the owner of the user or be signed is an admin to successfully update a user.
+
+```
+{
+  ...values
+}
+```
+
+**DELELETE /users/:id**
+
+You must either be the owner of the user or be signed is an admin to successfully delete a user.
+
+**POST /users/password**
+
+Sets up the account for resetting its password, it generates a reset token and executes the `user:password-reset` hook.
+
+```
+{
+  user     : userId,
+  resetUrl : 'http://mysite.com/password-reset'
+}
+```
+
+**PUT /users/password**
+
+Sets the new provided `password` for the account with the provided reset `token`.
+
+```
+{
+  token    : STRING,
+  password : STRING
+}
 ```

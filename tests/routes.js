@@ -8,8 +8,8 @@ let _user   = null;
 before(function *() {
   let res = yield request.post(config.api.uri + '/auth/login', {
     body : {
-      email    : 'john.doe@test.none',
-      password : 'password'
+      identifier : 'john.doe@test.none',
+      password   : 'password'
     }
   });
   let body = res.body;
