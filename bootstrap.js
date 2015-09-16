@@ -13,7 +13,7 @@ module.exports = function *() {
     let admins = getAdmins();
     for (let i = 0, len = admins.length; i < len; i++) {
       let user = new User(admins[i]);
-      yield password.create(user, user.password);
+      yield password.create(user.password);
       yield user.save();
     }
   }

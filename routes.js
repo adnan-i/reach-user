@@ -1,5 +1,7 @@
 'use strict';
 
+let config = Reach.config.user;
+
 // ### Unique Routes
 
 Route.get('/users/me',       ['authenticate', 'UsersController@me']);
@@ -8,4 +10,6 @@ Route.put('/users/password',                  'UsersController@passwordReset');
 
 // ### User Resource
 
-Route.resource('users', 'UsersController');
+Route.resource('users', 'UsersController', {
+  params : config.params ? config.params : null
+});

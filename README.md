@@ -28,6 +28,7 @@ module.exports = {
    |--------------------------------------------------------------------------------
    |
    | admins : Array    > List of admin users to create if user table is empty.
+   | params : Array    > List of required parameters when creating a new user.
    | filter : Function > Function providing the available filtering options for the 
    |                     user.
    |
@@ -39,8 +40,13 @@ module.exports = {
         firstName : 'John',
         lastName  : 'Doe',
         email     : 'admin@fixture.none',
-        password  : 'admin',
+        password  : 'admin'
       }
+    ],
+    params : [
+      'firstName',
+      'lastName',
+      'password'
     ],
     filter : function (query, options) {
       return query(options, {
