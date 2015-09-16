@@ -31,14 +31,16 @@ after(function *() {
 describe('POST /users', function () {
   let url = config.api.uri + '/users';
 
-  it('should report missing required fields', function *() {
-    let res  = yield request.post(url);
-    let body = res.body;
-    assert.equal(res.statusCode, 400, body.message);
-    assert.equal(body.message, 'The fields [firstName, lastName, email, password] is missing', body.message);
-    assert.isArray(body.data.params, 'Params is not of type array');
-    assert.lengthOf(body.data.params, 4, 'Array has length of ' + body.data.params.length);
-  });
+  if (config.user.params.length) {
+    it('should report missing required fields', function *() {
+      let res  = yield request.post(url);
+      let body = res.body;
+      assert.equal(res.statusCode, 400, body.message);
+      assert.equal(body.message, 'The fields ['+ config.user.params.join(', ') +'] is missing', body.message);
+      assert.isArray(body.data.params, 'Params is not of type array');
+      assert.lengthOf(body.data.params, config.user.params.length, 'Array has length of ' + body.data.params.length);
+    });
+  }
 
   it('should create a new user', function *() {
     let res = yield request.post(url, {
