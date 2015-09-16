@@ -64,12 +64,12 @@ module.exports = {
 
 ## [Hooks](#hooks)
 
-This module currently provides access to two hooks, `user:register` and `user:password-reset`.
+This module currently provides access to two hooks, `user:registered` and `user:password-reset`.
 
-**user:register**
+**user:registered**
 
 ```js
-hooks.set('user:register', function *(user) {
+hooks.set('user:registered', function *(user) {
   /*
     user : The User model that was created successfully.
    */
