@@ -1,6 +1,6 @@
 {
   "name": "reach-user",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "author": "Christoffer Rødvik",
   "description": "A user management module for reach-api.",
   "repository": {
@@ -13,6 +13,7 @@
   "license": "MIT",
   "reach": {
     "name": "user",
-    "type": "module"
+    "type": "module",
+    "priority": true
   }
 }
