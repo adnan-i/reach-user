@@ -120,7 +120,6 @@ describe('GET /users/me', function () {
     let body = res.body;
     assert.equal(res.statusCode, 401, body.message);
     assert.isObject(body, 'Response is not of type object!');
-    assert.equal(body.code, 'AUTH_ERROR', body.code);
   });
 });
 
@@ -186,7 +185,6 @@ describe('PUT /users/:id', function () {
     let body = res.body;
     assert.equal(res.statusCode, 401, body.message);
     assert.isObject(body, 'Response is not of type object!');
-    assert.equal(body.code, 'AUTH_ERROR', body.code);
   });
 });
 
