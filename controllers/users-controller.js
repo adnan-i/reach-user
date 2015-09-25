@@ -1,9 +1,8 @@
 'use strict';
 
-let userService     = require('../lib/user-service');
-let passwordService = require('../lib/password-service');
-let error           = Reach.Error;
-let config          = Reach.config.user;
+let userService = require('../lib/user-service');
+let error       = Reach.Error;
+let config      = Reach.config.user;
 
 Reach.Register.ResourceController('User', 'UsersController', function (controller) {
 
@@ -21,7 +20,7 @@ Reach.Register.ResourceController('User', 'UsersController', function (controlle
    * @method passwordToken
    */
   controller.passwordToken = function *(data) {
-    return yield userService.passwordToken(data.user, data.resetUrl);
+    return yield userService.passwordToken(data.identifier);
   };
 
   /**

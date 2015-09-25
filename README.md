@@ -64,7 +64,19 @@ module.exports = {
 
 ## [Hooks](#hooks)
 
-This module currently provides access to two hooks, `user:registered` and `user:password-reset`.
+This module currently provides access to two hooks, `user:get`, `user:registered` and `user:send-password-token`.
+
+**user:get**
+
+```js
+hooks.set('user:get', function *(identifier) {
+  return yield User.findOne({
+    where : {
+      email : identifier
+    }
+  });
+});
+```
 
 **user:registered**
 
@@ -76,14 +88,13 @@ hooks.set('user:registered', function *(user) {
 });
 ```
 
-**user:password-reset**
+**user:send-password-token**
 
 ```js
-hooks.set('user:password-reset', function *(user, token, resetUrl) {
+hooks.set('user:password-reset', function *(user, token) {
   /*
-    user     : The User model that is requesting a password reset.
-    token    : The token required to reset the password.
-    resetUrl : The url pointing to the front end endpoint for resetting the password.
+    user  : The User model that is requesting a password reset.
+    token : The token required to reset the password.
    */
 });
 ```
