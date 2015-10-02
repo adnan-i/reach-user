@@ -17,7 +17,16 @@ Reach.Register.ResourceController('User', 'UsersController', function (controlle
   };
 
   /**
+   * @method verify
+   * @param  {Object} data
+   */
+  controller.verify = function *(data) {
+    return yield userService.verify(data.token);
+  };
+
+  /**
    * @method passwordToken
+   * @param  {Object} data
    */
   controller.passwordToken = function *(data) {
     return yield userService.passwordToken(data.identifier);
