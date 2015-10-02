@@ -1,6 +1,6 @@
 {
   "name": "reach-user",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "author": "Christoffer Rødvik",
   "description": "A user management module for reach-api.",
   "repository": {
