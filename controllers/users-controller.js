@@ -29,7 +29,7 @@ Reach.Register.ResourceController('User', 'UsersController', function (controlle
    * @param  {Object} data
    */
   controller.passwordToken = function *(data) {
-    return yield userService.passwordToken(data.identifier);
+    return yield userService.passwordToken(data.identifier, data.resetUrl);
   };
 
   /**
@@ -74,5 +74,5 @@ Reach.Register.ResourceController('User', 'UsersController', function (controlle
   controller._options = config.filter.bind(null, Reach.provider('sequelize/helpers').query);
 
   return controller;
-  
+
 });
